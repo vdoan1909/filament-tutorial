@@ -30,6 +30,7 @@ class User extends Authenticatable implements HasTenants
     protected $fillable = [
         'name',
         'email',
+        'image',
         'password',
     ];
 
