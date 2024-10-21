@@ -51,6 +51,7 @@ class User extends Authenticatable implements HasTenants
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password' => 'hashed'
     ];
 
     public function teams(): BelongsToMany

@@ -29,6 +29,7 @@ class AppPanelProvider extends PanelProvider
             ->default()
             ->id('app')
             ->path('app')
+            ->profile()
             ->login()
             ->registration()
             ->colors([
@@ -39,7 +40,6 @@ class AppPanelProvider extends PanelProvider
                 'success' => Color::Emerald,
                 'warning' => Color::Orange,
             ])
-            ->profile()
             ->userMenuItems(
                 [
                     MenuItem::make()
