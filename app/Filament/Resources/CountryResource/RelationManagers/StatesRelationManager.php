@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\CountryResource\RelationManagers;
 
+use App\Models\Country;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -16,11 +18,15 @@ class StatesRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
+        $tenant = Filament::getTenant();
         return $form
             ->schema([
                 Forms\Components\Select::make('country_id')
                     ->label('Country')
-                    ->relationship('country', 'name')
+                    ->options(function () use ($tenant) {
+                        return Country::where('team_id', $tenant->id)
+                            ->pluck('name', 'id');
+                    })
                     ->searchable()
                     ->preload()
                     ->required(),

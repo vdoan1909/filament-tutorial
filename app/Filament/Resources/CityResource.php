@@ -6,6 +6,8 @@ use App\Filament\Resources\CityResource\Pages;
 use App\Filament\Resources\CityResource\RelationManagers;
 use App\Filament\Resources\CityResource\RelationManagers\EmployeesRelationManager;
 use App\Models\City;
+use App\Models\State;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
@@ -40,11 +42,15 @@ class CityResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $tenant = Filament::getTenant();
         return $form
             ->schema([
                 Forms\Components\Select::make('state_id')
                     ->label('State')
-                    ->relationship('state', 'name')
+                    ->options(function () use ($tenant) {
+                        return State::where('team_id', $tenant->id)
+                            ->pluck('name', 'id');
+                    })
                     ->searchable()
                     ->preload()
                     ->required(),
