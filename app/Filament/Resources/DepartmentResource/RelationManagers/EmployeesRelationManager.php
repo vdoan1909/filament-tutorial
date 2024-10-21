@@ -178,13 +178,17 @@ class EmployeesRelationManager extends RelationManager
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                \Filament\Tables\Filters\SelectFilter::make('country_name')
+                \Filament\Tables\Filters\SelectFilter::make('country_id')
                     ->label('Filter By Country Name')
-                    ->relationship('country', 'name')
+                    ->options(function () {
+                        $tenant = Filament::getTenant();
+
+                        return Country::where('team_id', $tenant->id)
+                            ->pluck('name', 'id');
+                    })
                     ->searchable()
                     ->preload(),
-                \Filament\Tables\Filters\SelectFilter::make('first_name')
-                    ->label('Filter By First Name'),
+
                 \Filament\Tables\Filters\Filter::make('created_at')
                     ->form([
                         \Filament\Forms\Components\DatePicker::make('created_from')
@@ -193,7 +197,10 @@ class EmployeesRelationManager extends RelationManager
                             ->native(false),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
+                        $tenant = Filament::getTenant();
+
                         return $query
+                            ->where('team_id', $tenant->id)
                             ->when(
                                 $data['created_from'],
                                 fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
@@ -207,14 +214,12 @@ class EmployeesRelationManager extends RelationManager
                         $indicators = [];
 
                         if ($data['created_from'] ?? null) {
-                            $indicators[] = \Filament\Tables\Filters\Indicator::make('Created from ' . \Carbon\Carbon::parse($data['created_from'])
-                                ->toFormattedDateString())
+                            $indicators[] = \Filament\Tables\Filters\Indicator::make('Created from ' . \Carbon\Carbon::parse($data['created_from'])->toFormattedDateString())
                                 ->removeField('created_from');
                         }
 
                         if ($data['created_until'] ?? null) {
-                            $indicators[] = \Filament\Tables\Filters\Indicator::make('Created until ' . \Carbon\Carbon::parse($data['created_until'])
-                                ->toFormattedDateString())
+                            $indicators[] = \Filament\Tables\Filters\Indicator::make('Created until ' . \Carbon\Carbon::parse($data['created_until'])->toFormattedDateString())
                                 ->removeField('created_until');
                         }
 
