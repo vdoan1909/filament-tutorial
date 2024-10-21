@@ -6,6 +6,7 @@ use App\Filament\Resources\CityResource\Pages;
 use App\Filament\Resources\CityResource\RelationManagers;
 use App\Filament\Resources\CityResource\RelationManagers\EmployeesRelationManager;
 use App\Models\City;
+use App\Models\Country;
 use App\Models\State;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -80,9 +81,14 @@ class CityResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                \Filament\Tables\Filters\SelectFilter::make('state_name')
-                    ->label('Filter By State Name')
-                    ->relationship('state', 'name')
+                \Filament\Tables\Filters\SelectFilter::make('country_id')
+                    ->label('Filter By Country Name')
+                    ->options(function () {
+                        $tenant = Filament::getTenant();
+
+                        return Country::where('team_id', $tenant->id)
+                            ->pluck('name', 'id');
+                    })
                     ->searchable()
                     ->preload(),
             ])
